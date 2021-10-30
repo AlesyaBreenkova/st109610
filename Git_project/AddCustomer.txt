@@ -1,0 +1,144 @@
+' AddCustomer3
+Sub LaunchLoanApp()
+	'launch LoanApp only and if it was not launched yet
+	If Browser("name:=Loan Management System - Login").Exist (1) Then
+	     Reporter.ReportEvent micDone, "LoanApp", "LoanApp already opened."
+	Else 
+	     systemutil.Run "IExplore.exe", "http://test-hitekschool.com/lms/loans/2108"
+	End If
+
+	Wait(1)
+
+End Sub
+
+Sub CloseLoanApp()
+	'click button Logout
+	Browser("Loan Management System_2").Page("Loan Management System_2").WebButton("Logout").Click
+	
+	Wait(2)
+	' close browser
+	Browser("Loan Management System_2").Close
+End Sub
+
+Sub CloseErrorMessage
+
+    'click button 'OK' to close error message
+  Browser("Loan Management System - 'Lich").Page("Loan Management System - 'Lich").WebButton("OK").Click
+
+    'click button 'Cancel' in AddUser page 
+  Browser("Loan Management System - 'Lich").Page("Loan Management System - 'Lich").WebButton("Cancel").Click
+
+End Sub  
+
+Sub FillInAddCustomerFields (StrFirstName, StrLastName, StrStreet, StrCity, StrProvince, StrPostalCode)
+	Browser("Loan Management System_2").Page("Loan Management System_2").WebEdit("FirstName").Set StrFirstName
+	Browser("Loan Management System_2").Page("Loan Management System_2").WebEdit("LastName").Set StrLastName
+	Browser("Loan Management System_2").Page("Loan Management System_2").WebEdit("Street").Set StrStreet
+	Browser("Loan Management System_2").Page("Loan Management System_2").WebEdit("City").Set StrCity
+	Browser("Loan Management System_2").Page("Loan Management System_2").WebEdit("Province").Set StrProvince
+	Browser("Loan Management System_2").Page("Loan Management System_2").WebEdit("PostalCode").Set StrPostalCode
+	Browser("Loan Management System_2").Page("Loan Management System_2").WebButton("Save").Click
+End Sub
+
+	
+Sub Login (strBranch, strUsername, strPassword)
+Browser("Loan Management System_2").Page("Loan Management System").WebEdit("j_branch").Set strBranch
+Browser("Loan Management System_2").Page("Loan Management System").WebEdit("j_username").Set strUsername
+Browser("Loan Management System_2").Page("Loan Management System").WebEdit("j_password").Set strPassword
+Browser("Loan Management System_2").Page("Loan Management System").WebButton("Login").Click
+End Sub
+
+	
+Function InvalidInputValidation (strFirstName, strLastName) 
+
+    Dim blnRet 
+
+    If strFirstName = "" Then 
+        If Browser("Loan Management System_2").Page("Loan Management System_2").WebElement ("innerhtml:= Mandatory field 'First Name' is empty").Exist (5) Then 
+            Reporter.ReportEvent micPass, "Invalid Input Validation pass", " Error message Mandatory field 'First Name' is empty appears" 
+            blnRet = TRUE
+        End If
+    ElseIf strLastName = "" Then
+        If Browser("Loan Management System_2").Page("Loan Management System_2").WebElement ("innerhtml:= Mandatory field 'Last Name' is empty").Exist (0) Then 
+            Reporter.ReportEvent micPass, "Invalid Input Validation pass", " Error message Mandatory field 'Last Name' is empty appears" 
+            blnRet = TRUE 
+        End If 
+    Else
+        Reporter.ReportEvent micFail, "Invalid Input Validation fail", " Proper error message does not appear!" 
+        blnRet = FALSE
+    End if
+End Function
+
+
+
+Function AddCustomerWIthoutLastName (strFirstName, strStreet, strCity, strProvince, strPostalCode)
+LaunchLoanApp 'a sub procedure call
+Wait(2)
+
+Login "Lichfield", "admin", "abreenkova0406" 'a subprocedure call
+Wait(3)
+Browser("Loan Management System_2").Page("Loan Management System_2").WebButton("Customers").Click
+Browser("Loan Management System_2").Page("Loan Management System_2").WebButton("Action").Click
+wait(3)
+Browser("Loan Management System_2").Page("Loan Management System_2").Link("Add Customer").Click
+
+'Invalid input - missing LastName
+FillInAddCustomerFields strFirstName, "", strStreet, strCity, strProvince, strPostalCode 'a subprocedure call
+
+InvalidInputValidation strFirstName, strLastName
+
+CloseErrorMessage 
+
+CloseLoanApp
+
+End  Function 
+
+
+Function AddCustomer (strFirstName, strLastName, strStreet, strCity, strProvince, strPostalCode)
+
+LaunchLoanApp 'a sub procedure call
+
+Wait(2)
+
+If Browser("name:= Loan Management System - Login").Exist (1) Then
+	Reporter.ReportEvent micPass, "Login Page", " Was opened successfully"
+Else
+	Reporter.ReportEvent micFail, "Login Page", " Was not opened successfully. This step is failed!"
+End If
+
+Login "Lichfield", "admin", "abreenkova0406" 'a subprocedure call
+
+Wait(3)
+Browser("Loan Management System_2").Page("Loan Management System_2").WebButton("Customers").Click
+Browser("Loan Management System_2").Page("Loan Management System_2").WebButton("Action").Click
+wait(3)
+Browser("Loan Management System_2").Page("Loan Management System_2").Link("Add Customer").Click
+
+Wait (2)
+FillInAddCustomerFields strFirstName, strLastName, strStreet, strCity, strProvince, strPostalCode 'a subprocedure call
+
+wait(2)
+
+If (strFirstName <> "") AND (strLastName <> "") Then
+	'CloseLoanApp 'a sub procedure call
+	Wait (2)
+	'LaunchLoanApp 'a sub procedure call
+	'Wait (3)
+Else
+	InvalidInputValidation strFirstName, strLastName
+	Wait (1)
+	CloseErrorMessage 'a sub procedure call
+End If
+
+CloseLoanApp 'a sub procedure call
+
+End function
+
+AddCustomer "Valeria", "Stone", "Willingdon", "Vancouver", "BC", "V5K1K2"
+
+'Invalid input - missing First Name
+AddCustomer "", "Simpson", "Park Lane", "NY", "NY", "V5K1K9"
+
+'Invalid input - missing Last Name
+AddCustomer "Jessica", "", "Park Lane", "NY", "NY", "V5K1K9"
+
