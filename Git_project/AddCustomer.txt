@@ -136,6 +136,12 @@ End function
 
 AddCustomer "Valeria", "Stone", "Willingdon", "Vancouver", "BC", "V5K1K2"
 
+AddCustomer "Genevieve", "Poulin", "Monkland", "Montreal", "QC", "V7U1L2"
+
+AddCustomer "Celine", "Levesque", "Rue de L'Eglise", "Montreal", "QC", "1T42A3"
+
+AddCustomer "Lauraine", "Tibaudeau", "Avenue Acadie", "Montreal", "QC", "7T81L1"
+
 'Invalid input - missing First Name
 AddCustomer "", "Simpson", "Park Lane", "NY", "NY", "V5K1K9"
 
