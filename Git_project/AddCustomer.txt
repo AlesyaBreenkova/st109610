@@ -1,4 +1,5 @@
-' AddCustomer3
+' To test new ideas
+AddCustomer3
 Sub LaunchLoanApp()
 	'launch LoanApp only and if it was not launched yet
 	If Browser("name:=Loan Management System - Login").Exist (1) Then
